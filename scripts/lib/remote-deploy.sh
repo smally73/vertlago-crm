@@ -35,10 +35,10 @@ docker compose -f docker-compose.prod.yml --env-file .env.production build
 echo "[remote] Démarrage (config Nginx http-only pour l'instant)..."
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d db backend frontend nginx
 
-echo "[remote] Attente du backend..."
+echo "[remote] Attente de PostgreSQL (pas juste le backend : /api/health ne touche pas la DB)..."
 for i in $(seq 1 30); do
-  if docker compose -f docker-compose.prod.yml --env-file .env.production exec -T backend \
-      node -e "require('http').get('http://localhost:4000/api/health', r => process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))" 2>/dev/null; then
+  if docker compose -f docker-compose.prod.yml --env-file .env.production exec -T db \
+      pg_isready -U vertlago > /dev/null 2>&1; then
     break
   fi
   sleep 1
