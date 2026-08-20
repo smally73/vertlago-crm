@@ -19,7 +19,7 @@ module.exports = {
       name: 'vertlago-frontend-preprod',
       cwd: path.join(preprodDir, 'frontend'),
       script: 'node_modules/.bin/vite',
-      args: 'preview --mode preprod --port 5273 --strictPort',
+      args: 'preview --mode preprod --port 5273 --strictPort --host',
       interpreter: 'none',
     },
   ],

@@ -68,7 +68,7 @@ log_info "Migrations préprod..."
 (cd "$WORKTREE_DIR/backend" && npm run migrate)
 
 log_info "(Re)démarrage pm2 (préprod)..."
-npx pm2 startOrRestart ecosystem.config.js --only vertlago-api-preprod,vertlago-frontend-preprod
+npx pm2 startOrReload ecosystem.config.js --only vertlago-api-preprod,vertlago-frontend-preprod
 
 log_info "Smoke test API préprod..."
 sleep 2
