@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import ClientForm, { SOURCE_LABELS } from '../components/ClientForm';
+import { clientDisplayName } from '../utils';
 
 export default function ClientDetail() {
   const { id } = useParams();
@@ -84,7 +85,7 @@ export default function ClientDetail() {
   if (editing) {
     return (
       <div>
-        <h1 style={{ fontSize: 26, marginBottom: 20 }}>Modifier {client.first_name} {client.last_name}</h1>
+        <h1 style={{ fontSize: 26, marginBottom: 20 }}>Modifier {clientDisplayName(client)}</h1>
         <ClientForm initial={client} onSubmit={handleUpdate} submitLabel="Enregistrer les modifications" />
         <button className="btn btn-outline" style={{ marginTop: 12 }} onClick={() => setEditing(false)}>
           Annuler
@@ -97,7 +98,7 @@ export default function ClientDetail() {
     <div>
       <div className="detail-header">
         <div>
-          <h1 style={{ fontSize: 26 }}>{client.first_name} {client.last_name}</h1>
+          <h1 style={{ fontSize: 26 }}>{clientDisplayName(client)}</h1>
           <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
             <span className={`status-pill status-${client.status}`}>{client.status}</span>
             {(client.tags || []).map((t) => <span key={t} className="tag">{t}</span>)}

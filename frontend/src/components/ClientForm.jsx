@@ -24,8 +24,8 @@ export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistr
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!form.first_name || !form.last_name || !form.email) {
-      setError('Prénom, nom et email sont requis.');
+    if (!form.first_name && !form.last_name && !form.email && !form.instagram) {
+      setError('Au moins un identifiant est requis : prénom/nom, email ou Instagram.');
       return;
     }
     setSaving(true);
@@ -43,12 +43,17 @@ export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistr
 
   return (
     <form onSubmit={handleSubmit} className="card" style={{ padding: 28 }}>
+      <p style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 0, marginBottom: 20 }}>
+        Renseigne au moins un identifiant : prénom/nom, email ou Instagram
+        (un contact peut n'être connu que par l'un de ces trois).
+      </p>
+
       <Row>
-        <Field label="Prénom *">
-          <input value={form.first_name} onChange={(e) => update('first_name', e.target.value)} required />
+        <Field label="Prénom">
+          <input value={form.first_name} onChange={(e) => update('first_name', e.target.value)} />
         </Field>
-        <Field label="Nom *">
-          <input value={form.last_name} onChange={(e) => update('last_name', e.target.value)} required />
+        <Field label="Nom">
+          <input value={form.last_name} onChange={(e) => update('last_name', e.target.value)} />
         </Field>
       </Row>
 
@@ -66,8 +71,8 @@ export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistr
       </Row>
 
       <Row>
-        <Field label="Email *">
-          <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} required />
+        <Field label="Email">
+          <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} />
         </Field>
         <Field label="Téléphone">
           <input value={form.phone} onChange={(e) => update('phone', e.target.value)} />

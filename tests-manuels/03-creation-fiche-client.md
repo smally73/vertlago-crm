@@ -14,29 +14,33 @@ champs obligatoires.
 détail, le statut par défaut est "Prospect", le pays par défaut est
 "Italie".
 
-## TC-13 — Prénom et nom obligatoires
+## TC-13 — Au moins un identifiant est requis
 
-**Objectif** : vérifier que le prénom et le nom sont réellement requis.
-
-**Étapes** :
-1. Sur le formulaire de nouveau client, laisser Prénom ou Nom vide, remplir
-   le reste.
-2. Cliquer sur "Créer la fiche".
-
-**Résultat attendu** : la création est bloquée, un message indique que le
-prénom et le nom sont requis, aucune fiche n'est créée.
-
-## TC-14 — Email obligatoire
-
-**Objectif** : vérifier que l'email est obligatoire (règle métier ajoutée
-spécifiquement).
+**Objectif** : vérifier qu'on ne peut pas créer une fiche totalement vide
+(sans aucun moyen d'identifier le contact). Prénom, nom et email sont
+chacun individuellement optionnels — c'est la combinaison des trois (plus
+Instagram) qui doit fournir au moins un identifiant.
 
 **Étapes** :
-1. Remplir Prénom et Nom, laisser Email vide.
+1. Sur le formulaire de nouveau client, laisser Prénom, Nom, Email **et**
+   Instagram tous vides.
 2. Cliquer sur "Créer la fiche".
 
-**Résultat attendu** : la création est bloquée (le navigateur ou le
-formulaire signale que l'email est requis), aucune fiche n'est créée.
+**Résultat attendu** : la création est bloquée, message "Au moins un
+identifiant est requis : prénom/nom, email ou Instagram.", aucune fiche
+n'est créée.
+
+## TC-14 — Client connu uniquement par son email
+
+**Objectif** : vérifier qu'on peut créer une fiche pour un contact dont on
+ne connaît que l'email (ex : quelqu'un qui écrit sans se présenter).
+
+**Étapes** :
+1. Remplir uniquement le champ Email, laisser Prénom/Nom/Instagram vides.
+2. Cliquer sur "Créer la fiche".
+
+**Résultat attendu** : la fiche est créée. Dans la liste et sur la fiche,
+l'email s'affiche à la place du nom (puisqu'il n'y en a pas).
 
 ## TC-15 — Création avec tous les champs remplis
 
@@ -82,6 +86,32 @@ chacune de ses valeurs.
 **Résultat attendu** : chaque fiche affiche le bon libellé français ; le
 5e client n'affiche rien à côté de "Rencontré via" (pas d'erreur, pas de
 valeur vide affichée bizarrement).
+
+## TC-40 — Client connu uniquement par son Instagram
+
+**Objectif** : même scénario que TC-14, mais avec Instagram comme seul
+identifiant (cas d'usage à l'origine de cette règle : un contact qui écrit
+en DM sans se présenter).
+
+**Étapes** :
+1. Remplir uniquement le champ Instagram, laisser Prénom/Nom/Email vides.
+2. Cliquer sur "Créer la fiche".
+
+**Résultat attendu** : la fiche est créée. Le compte Instagram s'affiche à
+la place du nom dans la liste et sur la fiche. La recherche par ce compte
+Instagram (même partiel) doit aussi retrouver la fiche.
+
+## TC-41 — Prénom seul, sans nom de famille
+
+**Objectif** : vérifier qu'on n'est pas obligé de connaître le nom de
+famille pour que le prénom compte comme identifiant.
+
+**Étapes** :
+1. Remplir uniquement le champ Prénom, laisser Nom/Email/Instagram vides.
+2. Cliquer sur "Créer la fiche".
+
+**Résultat attendu** : la création réussit (pas besoin du nom de famille en
+plus).
 
 ## TC-18 — Annulation de la création
 

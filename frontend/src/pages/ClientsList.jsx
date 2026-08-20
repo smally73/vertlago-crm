@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
+import { clientDisplayName } from '../utils';
 
 export default function ClientsList() {
   const { token } = useAuth();
@@ -40,7 +41,7 @@ export default function ClientsList() {
 
       <div className="list-toolbar">
         <input
-          placeholder="Rechercher (nom, entreprise, email...)"
+          placeholder="Rechercher (nom, entreprise, email, Instagram...)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{ flex: 1, padding: '9px 12px', border: '1px solid var(--line)', borderRadius: 6 }}
@@ -83,7 +84,7 @@ export default function ClientsList() {
                   >
                     <td style={td}>
                       <Link to={`/clients/${c.id}`} style={{ color: 'var(--ink)', fontWeight: 500, textDecoration: 'none' }}>
-                        {c.first_name} {c.last_name}
+                        {clientDisplayName(c)}
                       </Link>
                     </td>
                     <td style={td}>{c.company_name || '—'}</td>

@@ -16,18 +16,24 @@ et que les changements sont bien enregistrés.
 **Résultat attendu** : retour à la fiche de détail avec les nouvelles
 valeurs affichées correctement.
 
-## TC-20 — Email obligatoire aussi en modification
+## TC-20 — La règle "au moins un identifiant" s'applique aussi en modification
 
-**Objectif** : vérifier que la règle "email obligatoire" s'applique aussi
-en modification, pas seulement à la création.
+**Objectif** : vérifier que la règle "au moins un identifiant" (voir
+[03-creation-fiche-client.md](03-creation-fiche-client.md), TC-13)
+s'applique aussi en modification, pas seulement à la création — on ne doit
+pas pouvoir vider une fiche jusqu'à ce qu'elle n'ait plus aucun moyen
+d'identifier le contact.
 
 **Étapes** :
-1. Ouvrir "Modifier" sur une fiche existante.
-2. Vider le champ Email.
+1. Ouvrir "Modifier" sur une fiche qui n'a qu'un seul identifiant rempli
+   (ex : seulement un email, pas de nom ni d'Instagram).
+2. Vider ce champ Email sans en remplir d'autre.
 3. Cliquer sur "Enregistrer les modifications".
 
 **Résultat attendu** : la modification est bloquée, message d'erreur clair,
-l'email d'origine reste inchangé en base.
+l'email d'origine reste inchangé en base. (Vider l'email d'une fiche qui a
+*par ailleurs* un prénom/nom ou un Instagram doit, lui, réussir sans
+problème.)
 
 ## TC-21 — Annuler une modification en cours
 

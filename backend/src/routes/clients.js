@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
   if (search) {
     params.push(`%${search.toLowerCase()}%`);
     conditions.push(
-      `(LOWER(first_name) LIKE $${params.length} OR LOWER(last_name) LIKE $${params.length} OR LOWER(COALESCE(company_name, '')) LIKE $${params.length} OR LOWER(COALESCE(email, '')) LIKE $${params.length})`
+      `(LOWER(COALESCE(first_name, '')) LIKE $${params.length} OR LOWER(COALESCE(last_name, '')) LIKE $${params.length} OR LOWER(COALESCE(company_name, '')) LIKE $${params.length} OR LOWER(COALESCE(email, '')) LIKE $${params.length} OR LOWER(COALESCE(instagram, '')) LIKE $${params.length})`
     );
   }
   if (status) {
@@ -56,11 +56,8 @@ router.post('/', async (req, res) => {
     tags, notes, status, instagram, source,
   } = req.body;
 
-  if (!first_name || !last_name) {
-    return res.status(400).json({ error: 'Prénom et nom sont requis.' });
-  }
-  if (!email) {
-    return res.status(400).json({ error: 'Email requis.' });
+  if (!first_name && !last_name && !email && !instagram) {
+    return res.status(400).json({ error: 'Au moins un identifiant est requis : prénom/nom, email ou Instagram.' });
   }
 
   const { rows } = await pool.query(
@@ -69,8 +66,8 @@ router.post('/', async (req, res) => {
        postal_code, city, country, tags, notes, status, instagram, source, created_by)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,COALESCE($10,'Italie'),COALESCE($11::text[],'{}'),$12,COALESCE($13,'prospect'),$14,$15,$16)
      RETURNING *`,
-    [first_name, last_name, company_name, email, phone, address_line1, address_line2,
-      postal_code, city, country, tags, notes, status, instagram, source || null, req.user.id]
+    [first_name || null, last_name || null, company_name, email || null, phone, address_line1, address_line2,
+      postal_code, city, country, tags, notes, status, instagram || null, source || null, req.user.id]
   );
   res.status(201).json(rows[0]);
 });
@@ -84,15 +81,17 @@ router.put('/:id', async (req, res) => {
     'tags', 'notes', 'status', 'instagram', 'source',
   ];
 
-  if ('email' in req.body && !req.body.email) {
-    return res.status(400).json({ error: 'Email requis.' });
+  const identityFields = ['first_name', 'last_name', 'email', 'instagram'];
+  if (identityFields.every((f) => f in req.body) && !identityFields.some((f) => req.body[f])) {
+    return res.status(400).json({ error: 'Au moins un identifiant est requis : prénom/nom, email ou Instagram.' });
   }
 
+  const nullableFields = ['source', ...identityFields];
   const updates = [];
   const params = [];
   for (const field of fields) {
     if (field in req.body) {
-      const value = field === 'source' ? (req.body[field] || null) : req.body[field];
+      const value = nullableFields.includes(field) ? (req.body[field] || null) : req.body[field];
       params.push(value);
       updates.push(`${field} = $${params.length}`);
     }
