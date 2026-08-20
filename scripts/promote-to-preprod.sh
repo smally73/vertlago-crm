@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# Promeut la branche main vers preprod, rebuild le worktree préprod local et
+# redémarre les process pm2 correspondants. Sûr à relancer plusieurs fois.
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+source scripts/lib/common.sh
+
+PREPROD_BRANCH="preprod"
+WORKTREE_DIR="../vertlago-crm-preprod"
+BACKEND_PORT=4100
+FRONTEND_PORT=5273
+
+log_info "Vérification de la branche main..."
+require_clean_branch main
+git fetch origin main --quiet
+if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]]; then
+  log_error "main locale différente de origin/main. Push/pull d'abord."
+  exit 1
+fi
+
+log_info "Merge main -> $PREPROD_BRANCH"
+if git show-ref --verify --quiet "refs/heads/$PREPROD_BRANCH"; then
+  git checkout "$PREPROD_BRANCH"
+else
+  git checkout -b "$PREPROD_BRANCH"
+fi
+git merge main --ff-only
+git push origin "$PREPROD_BRANCH"
+git checkout main
+
+log_info "Vérification du worktree préprod ($WORKTREE_DIR)..."
+if [[ ! -d "$WORKTREE_DIR" ]]; then
+  log_info "Création du worktree"
+  git worktree add "$WORKTREE_DIR" "$PREPROD_BRANCH"
+else
+  (cd "$WORKTREE_DIR" && git checkout "$PREPROD_BRANCH" && git merge origin/"$PREPROD_BRANCH" --ff-only)
+fi
+
+# .env générés une seule fois (jamais écrasés ensuite, pour préserver d'éventuels ajustements manuels)
+if [[ ! -f "$WORKTREE_DIR/backend/.env" ]]; then
+  log_info "Génération de backend/.env (première fois, à partir de .env.preprod.example)"
+  cp "$WORKTREE_DIR/backend/.env.preprod.example" "$WORKTREE_DIR/backend/.env"
+  SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+  sed -i "s/JWT_SECRET=.*/JWT_SECRET=$SECRET/" "$WORKTREE_DIR/backend/.env"
+fi
+if [[ ! -f "$WORKTREE_DIR/frontend/.env.preprod" ]]; then
+  log_info "Génération de frontend/.env.preprod (première fois)"
+  cp "$WORKTREE_DIR/frontend/.env.preprod.example" "$WORKTREE_DIR/frontend/.env.preprod"
+fi
+
+log_info "Installation des dépendances..."
+(cd "$WORKTREE_DIR/backend" && npm ci --silent)
+(cd "$WORKTREE_DIR/frontend" && npm ci --silent)
+
+log_info "Build du frontend (mode preprod)..."
+(cd "$WORKTREE_DIR/frontend" && npm run build -- --mode preprod)
+
+log_info "Démarrage de PostgreSQL préprod (Docker)..."
+docker compose -f docker-compose.preprod.yml up -d
+
+log_info "Attente de PostgreSQL préprod (port 5433)..."
+for i in $(seq 1 30); do
+  if (exec 3<>/dev/tcp/localhost/5433) 2>/dev/null; then exec 3>&-; break; fi
+  sleep 1
+done
+
+log_info "Migrations préprod..."
+(cd "$WORKTREE_DIR/backend" && npm run migrate)
+
+log_info "(Re)démarrage pm2 (préprod)..."
+npx pm2 startOrRestart ecosystem.config.js --only vertlago-api-preprod,vertlago-frontend-preprod
+
+log_info "Smoke test API préprod..."
+sleep 2
+if curl -sf "http://localhost:$BACKEND_PORT/api/health" > /dev/null; then
+  log_ok "API préprod OK (port $BACKEND_PORT)"
+else
+  log_error "Échec du smoke test API préprod — voir 'npx pm2 logs vertlago-api-preprod'"
+  exit 1
+fi
+
+log_ok "Préprod à jour :"
+log_ok "  Frontend  http://localhost:$FRONTEND_PORT"
+log_ok "  API       http://localhost:$BACKEND_PORT/api"

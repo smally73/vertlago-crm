@@ -1,0 +1,9 @@
+{
+  "name": "vertlago-crm-tooling",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Outillage de déploiement (pm2, scripts de promotion) — pas le code applicatif, voir backend/ et frontend/",
+  "devDependencies": {
+    "pm2": "^5.4.2"
+  }
+}
