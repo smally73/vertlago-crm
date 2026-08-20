@@ -1,0 +1,128 @@
+import { useState } from 'react';
+
+const EMPTY = {
+  first_name: '', last_name: '', company_name: '', email: '', phone: '',
+  address_line1: '', address_line2: '', postal_code: '', city: '', country: 'Italie',
+  tags: '', notes: '', status: 'prospect',
+};
+
+export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistrer' }) {
+  const [form, setForm] = useState(() => ({
+    ...EMPTY,
+    ...initial,
+    tags: (initial?.tags || []).join(', '),
+  }));
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  function update(field, value) {
+    setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    if (!form.first_name || !form.last_name) {
+      setError('Prénom et nom sont requis.');
+      return;
+    }
+    setSaving(true);
+    try {
+      await onSubmit({
+        ...form,
+        tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="card" style={{ padding: 28 }}>
+      <Row>
+        <Field label="Prénom *">
+          <input value={form.first_name} onChange={(e) => update('first_name', e.target.value)} required />
+        </Field>
+        <Field label="Nom *">
+          <input value={form.last_name} onChange={(e) => update('last_name', e.target.value)} required />
+        </Field>
+      </Row>
+
+      <Row>
+        <Field label="Entreprise">
+          <input value={form.company_name} onChange={(e) => update('company_name', e.target.value)} />
+        </Field>
+        <Field label="Statut">
+          <select value={form.status} onChange={(e) => update('status', e.target.value)}>
+            <option value="prospect">Prospect</option>
+            <option value="actif">Actif</option>
+            <option value="inactif">Inactif</option>
+          </select>
+        </Field>
+      </Row>
+
+      <Row>
+        <Field label="Email">
+          <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} />
+        </Field>
+        <Field label="Téléphone">
+          <input value={form.phone} onChange={(e) => update('phone', e.target.value)} />
+        </Field>
+      </Row>
+
+      <Row>
+        <Field label="Adresse">
+          <input value={form.address_line1} onChange={(e) => update('address_line1', e.target.value)} />
+        </Field>
+        <Field label="Complément">
+          <input value={form.address_line2} onChange={(e) => update('address_line2', e.target.value)} />
+        </Field>
+      </Row>
+
+      <Row>
+        <Field label="Code postal">
+          <input value={form.postal_code} onChange={(e) => update('postal_code', e.target.value)} />
+        </Field>
+        <Field label="Ville">
+          <input value={form.city} onChange={(e) => update('city', e.target.value)} />
+        </Field>
+        <Field label="Pays">
+          <input value={form.country} onChange={(e) => update('country', e.target.value)} />
+        </Field>
+      </Row>
+
+      <Field label="Tags (séparés par des virgules)">
+        <input
+          placeholder="ex: grossiste, boutique, VIP"
+          value={form.tags}
+          onChange={(e) => update('tags', e.target.value)}
+        />
+      </Field>
+
+      <Field label="Notes">
+        <textarea value={form.notes} onChange={(e) => update('notes', e.target.value)} />
+      </Field>
+
+      {error && <p className="error-text">{error}</p>}
+
+      <button className="btn btn-brass" type="submit" disabled={saving}>
+        {saving ? 'Enregistrement...' : submitLabel}
+      </button>
+    </form>
+  );
+}
+
+function Row({ children }) {
+  return <div style={{ display: 'flex', gap: 16 }}>{children}</div>;
+}
+
+function Field({ label, children }) {
+  return (
+    <div className="field" style={{ flex: 1 }}>
+      <label>{label}</label>
+      {children}
+    </div>
+  );
+}
