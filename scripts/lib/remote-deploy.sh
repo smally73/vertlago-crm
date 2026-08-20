@@ -29,11 +29,16 @@ if [[ ! -f .env.production ]]; then
   echo "[remote] .env.production généré avec des secrets aléatoires."
 fi
 
+if [[ ! -f deploy/nginx/active.conf ]]; then
+  echo "[remote] Premier déploiement : config Nginx http-only (pas encore de certificat)."
+  cp deploy/nginx/http-only.conf deploy/nginx/active.conf
+fi
+
 echo "[remote] Build des images..."
 docker compose -f docker-compose.prod.yml --env-file .env.production build
 
-echo "[remote] Démarrage (config Nginx http-only pour l'instant)..."
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d db backend frontend nginx
+echo "[remote] Démarrage..."
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d db backend frontend nginx certbot
 
 echo "[remote] Attente de PostgreSQL (pas juste le backend : /api/health ne touche pas la DB)..."
 for i in $(seq 1 30); do

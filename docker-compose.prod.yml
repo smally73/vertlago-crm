@@ -34,7 +34,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/nginx/http-only.conf:/etc/nginx/conf.d/default.conf:ro
+      # active.conf n'est pas commité : généré/mis à jour par
+      # scripts/lib/remote-deploy.sh et deploy/README.md (bootstrap
+      # http-only.conf puis ssl.conf une fois le certificat obtenu).
+      - ./deploy/nginx/active.conf:/etc/nginx/conf.d/default.conf:ro
       - certbot_webroot:/var/www/certbot
       - certbot_certs:/etc/letsencrypt
     depends_on:
@@ -43,6 +46,7 @@ services:
 
   certbot:
     image: certbot/certbot
+    restart: unless-stopped
     volumes:
       - certbot_webroot:/var/www/certbot
       - certbot_certs:/etc/letsencrypt
