@@ -18,23 +18,23 @@ if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]]; then
   exit 1
 fi
 
-log_info "Merge main -> $PREPROD_BRANCH"
-if git show-ref --verify --quiet "refs/heads/$PREPROD_BRANCH"; then
-  git checkout "$PREPROD_BRANCH"
-else
-  git checkout -b "$PREPROD_BRANCH"
-fi
-git merge main --ff-only
-git push origin "$PREPROD_BRANCH"
-git checkout main
-
-log_info "Vérification du worktree préprod ($WORKTREE_DIR)..."
+log_info "Merge main -> $PREPROD_BRANCH (via le worktree, jamais checkout ici)"
+# La branche preprod vit exclusivement dans le worktree ($WORKTREE_DIR) : on ne
+# la checkout jamais dans ce dossier (main), ce qui casserait le worktree
+# ("branch already checked out"). "main" reste une ref locale partagée, donc
+# `git merge main` depuis le worktree fonctionne sans le checkout ici.
 if [[ ! -d "$WORKTREE_DIR" ]]; then
   log_info "Création du worktree"
-  git worktree add "$WORKTREE_DIR" "$PREPROD_BRANCH"
+  if git show-ref --verify --quiet "refs/heads/$PREPROD_BRANCH"; then
+    git worktree add "$WORKTREE_DIR" "$PREPROD_BRANCH"
+    (cd "$WORKTREE_DIR" && git merge main --ff-only)
+  else
+    git worktree add "$WORKTREE_DIR" -b "$PREPROD_BRANCH" main
+  fi
 else
-  (cd "$WORKTREE_DIR" && git checkout "$PREPROD_BRANCH" && git merge origin/"$PREPROD_BRANCH" --ff-only)
+  (cd "$WORKTREE_DIR" && git merge main --ff-only)
 fi
+(cd "$WORKTREE_DIR" && git push -u origin "$PREPROD_BRANCH")
 
 # .env générés une seule fois (jamais écrasés ensuite, pour préserver d'éventuels ajustements manuels)
 if [[ ! -f "$WORKTREE_DIR/backend/.env" ]]; then
