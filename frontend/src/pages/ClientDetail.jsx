@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import ClientForm, { SOURCE_LABELS } from '../components/ClientForm';
@@ -9,6 +9,7 @@ export default function ClientDetail() {
   const { token } = useAuth();
   const navigate = useNavigate();
   const [client, setClient] = useState(null);
+  const [notFound, setNotFound] = useState(false);
   const [editing, setEditing] = useState(false);
   const [noteContent, setNoteContent] = useState('');
   const [noteType, setNoteType] = useState('note');
@@ -17,8 +18,12 @@ export default function ClientDetail() {
   const [editType, setEditType] = useState('note');
 
   async function load() {
-    const data = await api.getClient(token, id);
-    setClient(data);
+    try {
+      const data = await api.getClient(token, id);
+      setClient(data);
+    } catch {
+      setNotFound(true);
+    }
   }
 
   useEffect(() => {
@@ -63,6 +68,15 @@ export default function ClientDetail() {
     if (!window.confirm('Supprimer définitivement cette interaction ?')) return;
     await api.deleteInteraction(token, id, interactionId);
     load();
+  }
+
+  if (notFound) {
+    return (
+      <div>
+        <p style={{ color: 'var(--ink-soft)' }}>Cette fiche client est introuvable.</p>
+        <Link to="/clients" className="btn btn-outline" style={{ marginTop: 12 }}>Retour à la liste</Link>
+      </div>
+    );
   }
 
   if (!client) return <p style={{ color: 'var(--ink-soft)' }}>Chargement...</p>;
