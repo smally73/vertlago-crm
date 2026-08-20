@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
-import ClientForm from '../components/ClientForm';
+import ClientForm, { SOURCE_LABELS } from '../components/ClientForm';
 
 export default function ClientDetail() {
   const { id } = useParams();
@@ -12,6 +12,9 @@ export default function ClientDetail() {
   const [editing, setEditing] = useState(false);
   const [noteContent, setNoteContent] = useState('');
   const [noteType, setNoteType] = useState('note');
+  const [editingInteractionId, setEditingInteractionId] = useState(null);
+  const [editContent, setEditContent] = useState('');
+  const [editType, setEditType] = useState('note');
 
   async function load() {
     const data = await api.getClient(token, id);
@@ -40,6 +43,25 @@ export default function ClientDetail() {
     if (!noteContent.trim()) return;
     await api.addInteraction(token, id, { type: noteType, content: noteContent });
     setNoteContent('');
+    load();
+  }
+
+  function startEditInteraction(interaction) {
+    setEditingInteractionId(interaction.id);
+    setEditType(interaction.type);
+    setEditContent(interaction.content);
+  }
+
+  async function handleSaveInteraction(interactionId) {
+    if (!editContent.trim()) return;
+    await api.updateInteraction(token, id, interactionId, { type: editType, content: editContent });
+    setEditingInteractionId(null);
+    load();
+  }
+
+  async function handleDeleteInteraction(interactionId) {
+    if (!window.confirm('Supprimer définitivement cette interaction ?')) return;
+    await api.deleteInteraction(token, id, interactionId);
     load();
   }
 
@@ -79,6 +101,8 @@ export default function ClientDetail() {
           <InfoRow label="Entreprise" value={client.company_name} />
           <InfoRow label="Email" value={client.email} />
           <InfoRow label="Téléphone" value={client.phone} />
+          <InfoRow label="Instagram" value={client.instagram} />
+          <InfoRow label="Rencontré via" value={client.source ? SOURCE_LABELS[client.source] : null} />
           <InfoRow
             label="Adresse"
             value={[client.address_line1, client.address_line2, client.postal_code, client.city, client.country]
@@ -118,10 +142,50 @@ export default function ClientDetail() {
             {client.interactions?.length ? (
               client.interactions.map((i) => (
                 <div key={i.id} style={{ borderLeft: '2px solid var(--brass)', paddingLeft: 12 }}>
-                  <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 2 }}>
-                    {i.type} · {new Date(i.created_at).toLocaleString('fr-FR')}
-                  </div>
-                  <div style={{ fontSize: 14 }}>{i.content}</div>
+                  {editingInteractionId === i.id ? (
+                    <>
+                      <select
+                        value={editType}
+                        onChange={(e) => setEditType(e.target.value)}
+                        style={{ padding: 6, border: '1px solid var(--line)', borderRadius: 6, marginBottom: 6 }}
+                      >
+                        <option value="note">Note</option>
+                        <option value="appel">Appel</option>
+                        <option value="email">Email</option>
+                        <option value="reunion">Réunion</option>
+                      </select>
+                      <textarea
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        style={{ width: '100%', padding: 9, border: '1px solid var(--line)', borderRadius: 6, minHeight: 60 }}
+                      />
+                      <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+                        <button className="btn btn-brass" onClick={() => handleSaveInteraction(i.id)}>Enregistrer</button>
+                        <button className="btn btn-outline" onClick={() => setEditingInteractionId(null)}>Annuler</button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
+                        <span>{i.type} · {new Date(i.created_at).toLocaleString('fr-FR')}</span>
+                        <span style={{ display: 'flex', gap: 8 }}>
+                          <button
+                            onClick={() => startEditInteraction(i)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', fontSize: 12, padding: 0 }}
+                          >
+                            Modifier
+                          </button>
+                          <button
+                            onClick={() => handleDeleteInteraction(i.id)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--rust)', fontSize: 12, padding: 0 }}
+                          >
+                            Supprimer
+                          </button>
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 14 }}>{i.content}</div>
+                    </>
+                  )}
                 </div>
               ))
             ) : (

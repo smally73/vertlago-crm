@@ -53,21 +53,24 @@ router.post('/', async (req, res) => {
   const {
     first_name, last_name, company_name, email, phone,
     address_line1, address_line2, postal_code, city, country,
-    tags, notes, status,
+    tags, notes, status, instagram, source,
   } = req.body;
 
   if (!first_name || !last_name) {
     return res.status(400).json({ error: 'Prénom et nom sont requis.' });
   }
+  if (!email) {
+    return res.status(400).json({ error: 'Email requis.' });
+  }
 
   const { rows } = await pool.query(
     `INSERT INTO clients
       (first_name, last_name, company_name, email, phone, address_line1, address_line2,
-       postal_code, city, country, tags, notes, status, created_by)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,COALESCE($10,'Italie'),COALESCE($11::text[],'{}'),$12,COALESCE($13,'prospect'),$14)
+       postal_code, city, country, tags, notes, status, instagram, source, created_by)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,COALESCE($10,'Italie'),COALESCE($11::text[],'{}'),$12,COALESCE($13,'prospect'),$14,$15,$16)
      RETURNING *`,
     [first_name, last_name, company_name, email, phone, address_line1, address_line2,
-      postal_code, city, country, tags, notes, status, req.user.id]
+      postal_code, city, country, tags, notes, status, instagram, source || null, req.user.id]
   );
   res.status(201).json(rows[0]);
 });
@@ -78,14 +81,19 @@ router.put('/:id', async (req, res) => {
   const fields = [
     'first_name', 'last_name', 'company_name', 'email', 'phone',
     'address_line1', 'address_line2', 'postal_code', 'city', 'country',
-    'tags', 'notes', 'status',
+    'tags', 'notes', 'status', 'instagram', 'source',
   ];
+
+  if ('email' in req.body && !req.body.email) {
+    return res.status(400).json({ error: 'Email requis.' });
+  }
 
   const updates = [];
   const params = [];
   for (const field of fields) {
     if (field in req.body) {
-      params.push(req.body[field]);
+      const value = field === 'source' ? (req.body[field] || null) : req.body[field];
+      params.push(value);
       updates.push(`${field} = $${params.length}`);
     }
   }
@@ -128,6 +136,35 @@ router.post('/:id/interactions', async (req, res) => {
     [id, req.user.id, type, content]
   );
   res.status(201).json(rows[0]);
+});
+
+// Modification d'une interaction du journal
+router.put('/:id/interactions/:interactionId', async (req, res) => {
+  const { interactionId } = req.params;
+  const { type, content } = req.body;
+  if (!content) {
+    return res.status(400).json({ error: 'Le contenu est requis.' });
+  }
+
+  const { rows } = await pool.query(
+    `UPDATE client_interactions SET type = COALESCE($1, type), content = $2
+     WHERE id = $3 RETURNING *`,
+    [type, content, interactionId]
+  );
+  if (!rows[0]) {
+    return res.status(404).json({ error: 'Interaction introuvable.' });
+  }
+  res.json(rows[0]);
+});
+
+// Suppression d'une interaction du journal
+router.delete('/:id/interactions/:interactionId', async (req, res) => {
+  const { interactionId } = req.params;
+  const { rowCount } = await pool.query('DELETE FROM client_interactions WHERE id = $1', [interactionId]);
+  if (!rowCount) {
+    return res.status(404).json({ error: 'Interaction introuvable.' });
+  }
+  res.status(204).send();
 });
 
 module.exports = router;

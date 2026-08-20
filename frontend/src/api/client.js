@@ -33,4 +33,8 @@ export const api = {
   deleteClient: (token, id) => request(`/clients/${id}`, { method: 'DELETE', token }),
   addInteraction: (token, id, payload) =>
     request(`/clients/${id}/interactions`, { method: 'POST', body: payload, token }),
+  updateInteraction: (token, clientId, interactionId, payload) =>
+    request(`/clients/${clientId}/interactions/${interactionId}`, { method: 'PUT', body: payload, token }),
+  deleteInteraction: (token, clientId, interactionId) =>
+    request(`/clients/${clientId}/interactions/${interactionId}`, { method: 'DELETE', token }),
 };

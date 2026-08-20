@@ -3,8 +3,10 @@ import { useState } from 'react';
 const EMPTY = {
   first_name: '', last_name: '', company_name: '', email: '', phone: '',
   address_line1: '', address_line2: '', postal_code: '', city: '', country: 'Italie',
-  tags: '', notes: '', status: 'prospect',
+  tags: '', notes: '', status: 'prospect', instagram: '', source: '',
 };
+
+export const SOURCE_LABELS = { salon: 'Salon', instagram: 'Instagram', mailing: 'Mailing', autre: 'Autre' };
 
 export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistrer' }) {
   const [form, setForm] = useState(() => ({
@@ -22,8 +24,8 @@ export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistr
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!form.first_name || !form.last_name) {
-      setError('Prénom et nom sont requis.');
+    if (!form.first_name || !form.last_name || !form.email) {
+      setError('Prénom, nom et email sont requis.');
       return;
     }
     setSaving(true);
@@ -64,11 +66,26 @@ export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistr
       </Row>
 
       <Row>
-        <Field label="Email">
-          <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} />
+        <Field label="Email *">
+          <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} required />
         </Field>
         <Field label="Téléphone">
           <input value={form.phone} onChange={(e) => update('phone', e.target.value)} />
+        </Field>
+      </Row>
+
+      <Row>
+        <Field label="Instagram">
+          <input placeholder="@compte" value={form.instagram} onChange={(e) => update('instagram', e.target.value)} />
+        </Field>
+        <Field label="Rencontré via">
+          <select value={form.source} onChange={(e) => update('source', e.target.value)}>
+            <option value="">Non renseigné</option>
+            <option value="salon">Salon</option>
+            <option value="instagram">Instagram</option>
+            <option value="mailing">Mailing</option>
+            <option value="autre">Autre</option>
+          </select>
         </Field>
       </Row>
 
