@@ -36,17 +36,24 @@ else
 fi
 (cd "$WORKTREE_DIR" && git push -u origin "$PREPROD_BRANCH")
 
-# .env générés une seule fois (jamais écrasés ensuite, pour préserver d'éventuels ajustements manuels)
-if [[ ! -f "$WORKTREE_DIR/backend/.env" ]]; then
-  log_info "Génération de backend/.env (première fois, à partir de .env.preprod.example)"
-  cp "$WORKTREE_DIR/backend/.env.preprod.example" "$WORKTREE_DIR/backend/.env"
-  SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
-  sed -i "s/JWT_SECRET=.*/JWT_SECRET=$SECRET/" "$WORKTREE_DIR/backend/.env"
+# .env régénérés à chaque promotion depuis les .example (évite qu'un fichier
+# généré avant un changement de template reste figé sur une config obsolète —
+# c'est ce qui a cassé l'accès réseau après le passage à VITE_API_URL=/api).
+# Le JWT_SECRET existant est préservé pour ne pas invalider les sessions en
+# cours à chaque promotion.
+log_info "Régénération de backend/.env depuis .env.preprod.example"
+EXISTING_SECRET=""
+if [[ -f "$WORKTREE_DIR/backend/.env" ]]; then
+  EXISTING_SECRET=$(grep '^JWT_SECRET=' "$WORKTREE_DIR/backend/.env" | cut -d= -f2-)
 fi
-if [[ ! -f "$WORKTREE_DIR/frontend/.env.preprod" ]]; then
-  log_info "Génération de frontend/.env.preprod (première fois)"
-  cp "$WORKTREE_DIR/frontend/.env.preprod.example" "$WORKTREE_DIR/frontend/.env.preprod"
+cp "$WORKTREE_DIR/backend/.env.preprod.example" "$WORKTREE_DIR/backend/.env"
+if [[ -z "$EXISTING_SECRET" ]]; then
+  EXISTING_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 fi
+sed -i "s/JWT_SECRET=.*/JWT_SECRET=$EXISTING_SECRET/" "$WORKTREE_DIR/backend/.env"
+
+log_info "Régénération de frontend/.env.preprod depuis .env.preprod.example"
+cp "$WORKTREE_DIR/frontend/.env.preprod.example" "$WORKTREE_DIR/frontend/.env.preprod"
 
 log_info "Installation des dépendances..."
 (cd "$WORKTREE_DIR/backend" && npm ci --silent)
