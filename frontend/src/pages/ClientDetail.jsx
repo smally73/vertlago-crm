@@ -81,7 +81,7 @@ export default function ClientDetail() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+      <div className="detail-header">
         <div>
           <h1 style={{ fontSize: 26 }}>{client.first_name} {client.last_name}</h1>
           <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -95,7 +95,7 @@ export default function ClientDetail() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 20 }}>
+      <div className="two-col">
         <div className="card" style={{ padding: 24, flex: 1 }}>
           <h3 style={{ fontSize: 15, marginBottom: 14, color: 'var(--ink-soft)' }}>Coordonnées</h3>
           <InfoRow label="Entreprise" value={client.company_name} />

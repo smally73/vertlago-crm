@@ -32,9 +32,10 @@ export default function Login() {
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--sand)',
+        padding: 20,
       }}
     >
-      <form onSubmit={handleSubmit} className="card" style={{ padding: 40, width: 360 }}>
+      <form onSubmit={handleSubmit} className="card" style={{ padding: 40, width: '100%', maxWidth: 360 }}>
         <div style={{ marginBottom: 28 }}>
           <div style={{ fontSize: 12, letterSpacing: '0.14em', color: 'var(--brass-dark)', fontWeight: 600 }}>
             VERTLAGO

@@ -28,7 +28,7 @@ export default function ClientsList() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
+      <div className="list-header">
         <div>
           <h1 style={{ fontSize: 26 }}>Clients</h1>
           <p style={{ color: 'var(--ink-soft)', fontSize: 13.5, marginTop: 4 }}>
@@ -38,7 +38,7 @@ export default function ClientsList() {
         <Link to="/clients/new" className="btn btn-brass">+ Nouveau client</Link>
       </div>
 
-      <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
+      <div className="list-toolbar">
         <input
           placeholder="Rechercher (nom, entreprise, email...)"
           value={search}
@@ -63,42 +63,44 @@ export default function ClientsList() {
         ) : clients.length === 0 ? (
           <div style={{ padding: 24, color: 'var(--ink-soft)' }}>Aucun client pour l'instant.</div>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ textAlign: 'left', fontSize: 12, color: 'var(--ink-soft)', borderBottom: '1px solid var(--line)' }}>
-                <th style={th}>Nom</th>
-                <th style={th}>Entreprise</th>
-                <th style={th}>Contact</th>
-                <th style={th}>Statut</th>
-                <th style={th}>Tags</th>
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((c) => (
-                <tr
-                  key={c.id}
-                  style={{ borderBottom: '1px solid var(--line)', cursor: 'pointer' }}
-                  onClick={() => (window.location.href = `/clients/${c.id}`)}
-                >
-                  <td style={td}>
-                    <Link to={`/clients/${c.id}`} style={{ color: 'var(--ink)', fontWeight: 500, textDecoration: 'none' }}>
-                      {c.first_name} {c.last_name}
-                    </Link>
-                  </td>
-                  <td style={td}>{c.company_name || '—'}</td>
-                  <td style={td}>{c.email || c.phone || '—'}</td>
-                  <td style={td}>
-                    <span className={`status-pill status-${c.status}`}>{c.status}</span>
-                  </td>
-                  <td style={td}>
-                    {(c.tags || []).map((t) => (
-                      <span key={t} className="tag" style={{ marginRight: 4 }}>{t}</span>
-                    ))}
-                  </td>
+          <div className="table-scroll">
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ textAlign: 'left', fontSize: 12, color: 'var(--ink-soft)', borderBottom: '1px solid var(--line)' }}>
+                  <th style={th}>Nom</th>
+                  <th style={th}>Entreprise</th>
+                  <th style={th}>Contact</th>
+                  <th style={th}>Statut</th>
+                  <th style={th}>Tags</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {clients.map((c) => (
+                  <tr
+                    key={c.id}
+                    style={{ borderBottom: '1px solid var(--line)', cursor: 'pointer' }}
+                    onClick={() => (window.location.href = `/clients/${c.id}`)}
+                  >
+                    <td style={td}>
+                      <Link to={`/clients/${c.id}`} style={{ color: 'var(--ink)', fontWeight: 500, textDecoration: 'none' }}>
+                        {c.first_name} {c.last_name}
+                      </Link>
+                    </td>
+                    <td style={td}>{c.company_name || '—'}</td>
+                    <td style={td}>{c.email || c.phone || '—'}</td>
+                    <td style={td}>
+                      <span className={`status-pill status-${c.status}`}>{c.status}</span>
+                    </td>
+                    <td style={td}>
+                      {(c.tags || []).map((t) => (
+                        <span key={t} className="tag" style={{ marginRight: 4 }}>{t}</span>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

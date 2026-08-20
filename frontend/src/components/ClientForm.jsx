@@ -132,7 +132,7 @@ export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistr
 }
 
 function Row({ children }) {
-  return <div style={{ display: 'flex', gap: 16 }}>{children}</div>;
+  return <div className="form-row">{children}</div>;
 }
 
 function Field({ label, children }) {

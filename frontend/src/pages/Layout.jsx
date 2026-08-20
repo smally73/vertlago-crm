@@ -11,39 +11,30 @@ export default function Layout() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <aside
-        style={{
-          width: 220,
-          borderRight: '1px solid var(--line)',
-          background: 'var(--surface)',
-          padding: '24px 18px',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div style={{ marginBottom: 32 }}>
+    <div className="app-shell" style={{ display: 'flex', minHeight: '100vh' }}>
+      <aside className="sidebar">
+        <div className="sidebar-brand">
           <div style={{ fontSize: 11, letterSpacing: '0.14em', color: 'var(--brass-dark)', fontWeight: 600 }}>
             VERTLAGO
           </div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, marginTop: 2 }}>Back-office</div>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <nav className="sidebar-nav">
           <NavItem to="/clients" label="Clients" />
           {/* Modules à venir : Commandes, Stocks, Contrôle de gestion */}
         </nav>
 
-        <div style={{ marginTop: 'auto', paddingTop: 20, borderTop: '1px solid var(--line)' }}>
+        <div className="sidebar-user">
           <div style={{ fontSize: 13, fontWeight: 500 }}>{user?.full_name}</div>
           <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 12 }}>{user?.role}</div>
-          <button className="btn btn-outline" onClick={handleLogout} style={{ width: '100%', justifyContent: 'center' }}>
+          <button className="btn btn-outline sidebar-logout-btn" onClick={handleLogout}>
             Se déconnecter
           </button>
         </div>
       </aside>
 
-      <main style={{ flex: 1, padding: '32px 40px', maxWidth: 1100 }}>
+      <main className="main-content">
         <Outlet />
       </main>
     </div>
