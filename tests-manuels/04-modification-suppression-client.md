@@ -46,31 +46,86 @@ problème.)
 **Résultat attendu** : retour à la fiche de détail, aucune des
 modifications faites n'est enregistrée.
 
-## TC-22 — Suppression d'une fiche
+## TC-22 — Archiver une fiche
 
-**Objectif** : vérifier que la suppression fonctionne et redirige
-correctement.
+**Objectif** : vérifier que "Archiver" (qui a remplacé la suppression
+directe) fonctionne et redirige correctement. Un employé (pas seulement un
+admin) doit pouvoir le faire.
 
-**Pré-requis** : une fiche de test (pas une vraie fiche client).
-
-**Étapes** :
-1. Ouvrir la fiche, cliquer sur "Supprimer".
-2. Confirmer la boîte de dialogue de confirmation.
-
-**Résultat attendu** : redirection vers la liste des clients, la fiche
-supprimée n'apparaît plus, et le compteur "X fiche(s)" est à jour.
-
-## TC-23 — Annuler la suppression
-
-**Objectif** : vérifier que la boîte de confirmation empêche bien une
-suppression accidentelle.
+**Pré-requis** : une fiche de test (pas une vraie fiche client), statut
+autre qu'"Archivé".
 
 **Étapes** :
-1. Ouvrir une fiche, cliquer sur "Supprimer".
+1. Ouvrir la fiche : le bouton doit s'appeler "Archiver" (pas
+   "Supprimer").
+2. Cliquer dessus, confirmer la boîte de dialogue de confirmation.
+
+**Résultat attendu** : la fiche n'est **pas** supprimée (elle existe
+toujours en base, avec le statut "Archivé") ; elle disparaît juste de la
+liste par défaut (voir TC-09). Si redirigé vers la liste, le compteur "X
+fiche(s)" ne compte plus cette fiche.
+
+## TC-23 — Annuler l'archivage
+
+**Objectif** : vérifier que la boîte de confirmation empêche bien un
+archivage accidentel.
+
+**Étapes** :
+1. Ouvrir une fiche non archivée, cliquer sur "Archiver".
 2. Annuler la boîte de dialogue de confirmation (au lieu de valider).
 
-**Résultat attendu** : la fiche existe toujours, aucune suppression n'a eu
-lieu.
+**Résultat attendu** : la fiche garde son statut d'origine, aucun
+archivage n'a eu lieu.
+
+## TC-43 — Désarchiver une fiche
+
+**Objectif** : vérifier qu'une fiche archivée par erreur (ou dont le
+contact redevient actif) peut être restaurée par n'importe quel employé.
+
+**Pré-requis** : une fiche déjà archivée (voir TC-22).
+
+**Étapes** :
+1. Ouvrir la fiche archivée (via le filtre "Archivé" de la liste, TC-09).
+2. Le bouton doit maintenant s'appeler "Désarchiver" (plus "Archiver").
+3. Cliquer dessus.
+
+**Résultat attendu** : la fiche repasse en statut "Prospect" (pas besoin de
+confirmation pour cette action, contrairement à l'archivage) et réapparaît
+dans la liste par défaut.
+
+## TC-44 — Suppression définitive réservée aux admins
+
+**Objectif** : vérifier le point 7 de l'audit sécurité — seul un admin peut
+purger définitivement une fiche, et uniquement si elle est déjà archivée.
+
+**Pré-requis** : un compte admin, un compte employé (non-admin), une fiche
+de test déjà archivée.
+
+**Étapes** :
+1. Se connecter avec le compte **employé** (non-admin), ouvrir la fiche
+   archivée.
+2. Se connecter avec le compte **admin**, ouvrir la même fiche archivée.
+3. Cliquer sur "Supprimer définitivement", confirmer.
+
+**Résultat attendu** : à l'étape 1, aucun bouton de suppression définitive
+n'est visible pour l'employé (seul "Désarchiver" apparaît). À l'étape 3, la
+fiche est réellement supprimée de la base (plus retrouvable même avec le
+filtre "Archivé").
+
+## TC-45 — Impossible de purger une fiche non archivée
+
+**Objectif** : vérifier le filet de sécurité en profondeur — même un admin
+ne doit pas pouvoir supprimer définitivement une fiche sans d'abord
+l'archiver.
+
+**Pré-requis** : compte admin, une fiche **non** archivée.
+
+**Étapes** :
+1. En tant qu'admin, ouvrir une fiche dont le statut n'est pas "Archivé".
+
+**Résultat attendu** : aucun bouton "Supprimer définitivement" n'est
+visible, seulement "Archiver" — il faut archiver d'abord (TC-22) avant que
+l'option de suppression définitive n'apparaisse (TC-44).
 
 ## TC-24 — Accéder à une fiche qui n'existe plus/pas
 

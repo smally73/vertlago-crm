@@ -113,6 +113,19 @@ famille pour que le prénom compte comme identifiant.
 **Résultat attendu** : la création réussit (pas besoin du nom de famille en
 plus).
 
+## TC-42 — Le champ Pays est une liste déroulante
+
+**Objectif** : vérifier que le pays se choisit dans une liste plutôt que de
+se taper au clavier (évite les fautes de frappe/incohérences).
+
+**Étapes** :
+1. Sur le formulaire de nouveau client, cliquer sur le champ Pays.
+
+**Résultat attendu** : une liste déroulante s'ouvre avec une liste de pays
+(pas un champ texte libre), "Italie" est présélectionné par défaut. Choisir
+un autre pays (ex : "France") et créer la fiche : le pays choisi est bien
+enregistré et réaffiché sur la fiche.
+
 ## TC-18 — Annulation de la création
 
 **Objectif** : vérifier qu'on peut quitter le formulaire sans créer de

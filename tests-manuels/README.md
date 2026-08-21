@@ -17,6 +17,7 @@ connaissances techniques pour les exécuter.
 | [05-journal-interactions.md](05-journal-interactions.md) | Ajout, modification, suppression d'interactions |
 | [06-affichage-mobile.md](06-affichage-mobile.md) | Utilisation sur iPhone / petit écran |
 | [07-regressions-connues.md](07-regressions-connues.md) | Bugs déjà rencontrés et corrigés — à ne jamais laisser revenir |
+| [08-depenses.md](08-depenses.md) | Module Dépenses : création, filtres, totaux par devise |
 
 ## Comment utiliser ce dossier
 

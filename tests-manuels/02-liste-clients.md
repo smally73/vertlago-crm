@@ -46,17 +46,24 @@ minuscules).
 ## TC-09 — Filtre par statut
 
 **Objectif** : vérifier que le filtre de statut (Prospect / Actif /
-Inactif) fonctionne.
+Inactif / Archivé) fonctionne, et que les fiches archivées restent cachées
+par défaut.
 
-**Pré-requis** : au moins un client dans deux statuts différents.
+**Pré-requis** : au moins un client dans deux statuts différents, dont un
+archivé (voir
+[04-modification-suppression-client.md](04-modification-suppression-client.md)
+pour archiver une fiche).
 
 **Étapes** :
 1. Sélectionner "Actif" dans le menu déroulant de statut.
 2. Sélectionner "Prospect".
-3. Revenir à "Tous statuts".
+3. Sélectionner "Archivé".
+4. Revenir à "Tous statuts (hors archivés)".
 
 **Résultat attendu** : seuls les clients du statut sélectionné s'affichent
-à chaque fois ; "Tous statuts" réaffiche l'ensemble.
+à chaque fois, y compris pour "Archivé" (les fiches archivées sont bien
+consultables, juste pas affichées par défaut) ; "Tous statuts (hors
+archivés)" réaffiche tous les statuts sauf les fiches archivées.
 
 ## TC-10 — Combinaison recherche + filtre statut
 
