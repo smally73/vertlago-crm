@@ -20,12 +20,25 @@ bien enregistrés/réaffichés.
 
 **Étapes** :
 1. Cliquer sur "+ Nouvelle dépense".
-2. Remplir Montant, Devise, Date, Bénéficiaire, Motif, Typologie.
+2. Remplir Montant, Devise, Date, Modalité paiement, Bénéficiaire, Motif,
+   Typologie (tester en particulier "Confection", ajoutée récemment).
 3. Cliquer sur "Créer la dépense".
 
 **Résultat attendu** : redirection vers la liste, la nouvelle dépense
 apparaît avec toutes les valeurs saisies correctement affichées (date au
-format JJ/MM/AAAA, typologie sous forme d'étiquette, montant + devise).
+format JJ/MM/AAAA, typologie sous forme d'étiquette, montant + devise,
+modalité de paiement en clair dans sa colonne).
+
+## TC-65 — Modalité de paiement facultative
+
+**Objectif** : vérifier que "Modalité paiement" (Cash / Virement bancaire)
+n'est pas obligatoire, contrairement à Montant/Bénéficiaire/Typologie.
+
+**Étapes** :
+1. Créer une dépense en laissant "Modalité paiement" sur "Non renseigné".
+
+**Résultat attendu** : la création réussit ; la colonne "Modalité
+paiement" affiche "—" dans la liste pour cette dépense.
 
 ## TC-48 — Champs obligatoires
 
