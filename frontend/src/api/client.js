@@ -47,4 +47,12 @@ export const api = {
   createExpense: (token, payload) => request('/expenses', { method: 'POST', body: payload, token }),
   updateExpense: (token, id, payload) => request(`/expenses/${id}`, { method: 'PUT', body: payload, token }),
   deleteExpense: (token, id) => request(`/expenses/${id}`, { method: 'DELETE', token }),
+
+  getProducts: (token, params = {}) => {
+    const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v)).toString();
+    return request(`/products${qs ? `?${qs}` : ''}`, { token });
+  },
+  getProduct: (token, id) => request(`/products/${id}`, { token }),
+  createProduct: (token, payload) => request('/products', { method: 'POST', body: payload, token }),
+  updateProduct: (token, id, payload) => request(`/products/${id}`, { method: 'PUT', body: payload, token }),
 };

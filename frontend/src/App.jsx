@@ -8,6 +8,9 @@ import ClientDetail from './pages/ClientDetail';
 import ExpensesList from './pages/ExpensesList';
 import ExpenseNew from './pages/ExpenseNew';
 import ExpenseDetail from './pages/ExpenseDetail';
+import ProductsList from './pages/ProductsList';
+import ProductNew from './pages/ProductNew';
+import ProductDetail from './pages/ProductDetail';
 
 function PrivateRoute({ children }) {
   const { token, loading } = useAuth();
@@ -34,6 +37,9 @@ function AppRoutes() {
         <Route path="expenses" element={<ExpensesList />} />
         <Route path="expenses/new" element={<ExpenseNew />} />
         <Route path="expenses/:id" element={<ExpenseDetail />} />
+        <Route path="products" element={<ProductsList />} />
+        <Route path="products/new" element={<ProductNew />} />
+        <Route path="products/:id" element={<ProductDetail />} />
       </Route>
     </Routes>
   );
