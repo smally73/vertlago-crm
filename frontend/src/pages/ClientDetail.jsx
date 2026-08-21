@@ -7,7 +7,7 @@ import { clientDisplayName } from '../utils';
 
 export default function ClientDetail() {
   const { id } = useParams();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
   const [client, setClient] = useState(null);
   const [notFound, setNotFound] = useState(false);
@@ -38,8 +38,19 @@ export default function ClientDetail() {
     load();
   }
 
+  async function handleArchive() {
+    if (!window.confirm("Archiver cette fiche ? Elle n'apparaîtra plus dans la liste par défaut, mais restera consultable et pourra être désarchivée.")) return;
+    await api.updateClient(token, id, { status: 'archive' });
+    load();
+  }
+
+  async function handleUnarchive() {
+    await api.updateClient(token, id, { status: 'prospect' });
+    load();
+  }
+
   async function handleDelete() {
-    if (!window.confirm('Supprimer définitivement cette fiche client ?')) return;
+    if (!window.confirm('Supprimer DÉFINITIVEMENT cette fiche client ? Cette action est irréversible.')) return;
     await api.deleteClient(token, id);
     navigate('/clients');
   }
@@ -106,7 +117,16 @@ export default function ClientDetail() {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn btn-outline" onClick={() => setEditing(true)}>Modifier</button>
-          <button className="btn btn-outline" style={{ color: 'var(--rust)' }} onClick={handleDelete}>Supprimer</button>
+          {client.status === 'archive' ? (
+            <button className="btn btn-outline" onClick={handleUnarchive}>Désarchiver</button>
+          ) : (
+            <button className="btn btn-outline" style={{ color: 'var(--rust)' }} onClick={handleArchive}>Archiver</button>
+          )}
+          {user?.role === 'admin' && client.status === 'archive' && (
+            <button className="btn btn-outline" style={{ color: 'var(--rust)' }} onClick={handleDelete}>
+              Supprimer définitivement
+            </button>
+          )}
         </div>
       </div>
 

@@ -51,10 +51,11 @@ export default function ClientsList() {
           onChange={(e) => setStatus(e.target.value)}
           style={{ padding: '9px 12px', border: '1px solid var(--line)', borderRadius: 6 }}
         >
-          <option value="">Tous statuts</option>
+          <option value="">Tous statuts (hors archivés)</option>
           <option value="prospect">Prospect</option>
           <option value="actif">Actif</option>
           <option value="inactif">Inactif</option>
+          <option value="archive">Archivé</option>
         </select>
       </div>
 

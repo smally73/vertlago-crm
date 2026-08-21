@@ -66,6 +66,7 @@ export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistr
             <option value="prospect">Prospect</option>
             <option value="actif">Actif</option>
             <option value="inactif">Inactif</option>
+            <option value="archive">Archivé</option>
           </select>
         </Field>
       </Row>

@@ -1,6 +1,6 @@
 const express = require('express');
 const { pool } = require('../db');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -20,6 +20,10 @@ router.get('/', async (req, res) => {
   if (status) {
     params.push(status);
     conditions.push(`status = $${params.length}`);
+  } else {
+    // Les fiches archivées restent consultables mais sortent de la vue par
+    // défaut — il faut choisir explicitement le filtre "Archivé" pour les voir.
+    conditions.push(`status != 'archive'`);
   }
   if (tag) {
     params.push(tag);
@@ -111,8 +115,9 @@ router.put('/:id', async (req, res) => {
   res.json(rows[0]);
 });
 
-// Suppression d'une fiche client
-router.delete('/:id', async (req, res) => {
+// Suppression définitive d'une fiche client (réservée aux admins — la
+// suppression douce au quotidien se fait via PUT status='archive')
+router.delete('/:id', requireRole('admin'), async (req, res) => {
   const { id } = req.params;
   const { rowCount } = await pool.query('DELETE FROM clients WHERE id = $1', [id]);
   if (!rowCount) {

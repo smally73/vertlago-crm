@@ -146,6 +146,7 @@ a:focus-visible {
 .status-prospect { background: var(--sand); color: var(--brass-dark); }
 .status-actif { background: var(--sage-bg); color: var(--sage); }
 .status-inactif { background: var(--rust-bg); color: var(--rust); }
+.status-archive { background: var(--line); color: var(--ink-soft); }
 
 .error-text {
   color: var(--rust);
