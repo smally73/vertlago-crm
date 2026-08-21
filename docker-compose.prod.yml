@@ -9,7 +9,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-vertlago_crm}
     volumes:
       - vertlago_prod_db_data:/var/lib/postgresql/data
-    # Pas de port publié : accessible uniquement depuis le réseau Docker interne.
+    ports:
+      # Publié uniquement sur la loopback du VPS (jamais sur Internet) :
+      # accès distant réservé à un tunnel SSH (ex. DBeaver "SSH tunnel").
+      - "127.0.0.1:5432:5432"
 
   backend:
     build: ./backend
