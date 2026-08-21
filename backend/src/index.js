@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
+const expenseRoutes = require('./routes/expenses');
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_ORIGIN) {
   throw new Error('FRONTEND_ORIGIN doit être défini en production (sinon CORS retomberait sur *).');
@@ -39,6 +40,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
+app.use('/api/expenses', expenseRoutes);
 
 // Gestion d'erreurs générique
 app.use((err, req, res, next) => {

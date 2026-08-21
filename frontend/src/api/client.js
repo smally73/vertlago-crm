@@ -37,4 +37,14 @@ export const api = {
     request(`/clients/${clientId}/interactions/${interactionId}`, { method: 'PUT', body: payload, token }),
   deleteInteraction: (token, clientId, interactionId) =>
     request(`/clients/${clientId}/interactions/${interactionId}`, { method: 'DELETE', token }),
+
+  getExpenses: (token, params = {}) => {
+    const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v)).toString();
+    return request(`/expenses${qs ? `?${qs}` : ''}`, { token });
+  },
+  getExpenseBeneficiaries: (token) => request('/expenses/beneficiaries', { token }),
+  getExpense: (token, id) => request(`/expenses/${id}`, { token }),
+  createExpense: (token, payload) => request('/expenses', { method: 'POST', body: payload, token }),
+  updateExpense: (token, id, payload) => request(`/expenses/${id}`, { method: 'PUT', body: payload, token }),
+  deleteExpense: (token, id) => request(`/expenses/${id}`, { method: 'DELETE', token }),
 };

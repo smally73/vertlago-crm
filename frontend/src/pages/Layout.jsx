@@ -22,6 +22,7 @@ export default function Layout() {
 
         <nav className="sidebar-nav">
           <NavItem to="/clients" label="Clients" />
+          <NavItem to="/expenses" label="Dépenses" />
           {/* Modules à venir : Commandes, Stocks, Contrôle de gestion */}
         </nav>
 
