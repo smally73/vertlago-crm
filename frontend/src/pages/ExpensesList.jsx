@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
-import { CATEGORY_LABELS } from '../expenseCategories';
+import { CATEGORY_LABELS, PAYMENT_METHOD_LABELS } from '../expenseCategories';
 
 function periodDates(days) {
   const to = new Date();
@@ -139,6 +139,7 @@ export default function ExpensesList() {
                   <th style={th}>Bénéficiaire</th>
                   <th style={th}>Motif</th>
                   <th style={th}>Typologie</th>
+                  <th style={th}>Modalité paiement</th>
                   <th style={th}>Montant</th>
                 </tr>
               </thead>
@@ -159,6 +160,7 @@ export default function ExpensesList() {
                     <td style={td}>
                       <span className="tag">{CATEGORY_LABELS[e.category] || e.category}</span>
                     </td>
+                    <td style={td}>{e.payment_method ? PAYMENT_METHOD_LABELS[e.payment_method] : '—'}</td>
                     <td style={td}>{Number(e.amount).toFixed(2)} {e.currency}</td>
                   </tr>
                 ))}

@@ -68,17 +68,17 @@ router.get('/:id', async (req, res) => {
 
 // Création d'une dépense
 router.post('/', async (req, res) => {
-  const { amount, currency, expense_date, beneficiary, reason, category } = req.body;
+  const { amount, currency, expense_date, beneficiary, reason, category, payment_method } = req.body;
 
   if (!amount || !beneficiary || !category) {
     return res.status(400).json({ error: 'Montant, bénéficiaire et typologie sont requis.' });
   }
 
   const { rows } = await pool.query(
-    `INSERT INTO expenses (amount, currency, expense_date, beneficiary, reason, category, created_by)
-     VALUES ($1, COALESCE($2,'EUR'), COALESCE($3, CURRENT_DATE), $4, $5, $6, $7)
+    `INSERT INTO expenses (amount, currency, expense_date, beneficiary, reason, category, payment_method, created_by)
+     VALUES ($1, COALESCE($2,'EUR'), COALESCE($3, CURRENT_DATE), $4, $5, $6, $7, $8)
      RETURNING *`,
-    [amount, currency, expense_date || null, beneficiary, reason, category, req.user.id]
+    [amount, currency, expense_date || null, beneficiary, reason, category, payment_method || null, req.user.id]
   );
   res.status(201).json(rows[0]);
 });
@@ -86,13 +86,15 @@ router.post('/', async (req, res) => {
 // Mise à jour d'une dépense
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const fields = ['amount', 'currency', 'expense_date', 'beneficiary', 'reason', 'category'];
+  const fields = ['amount', 'currency', 'expense_date', 'beneficiary', 'reason', 'category', 'payment_method'];
+  const nullableFields = ['payment_method'];
 
   const updates = [];
   const params = [];
   for (const field of fields) {
     if (field in req.body) {
-      params.push(req.body[field]);
+      const value = nullableFields.includes(field) ? (req.body[field] || null) : req.body[field];
+      params.push(value);
       updates.push(`${field} = $${params.length}`);
     }
   }

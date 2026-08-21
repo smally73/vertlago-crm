@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
-import { CATEGORY_LABELS, CURRENCIES } from '../expenseCategories';
+import { CATEGORY_LABELS, CURRENCIES, PAYMENT_METHOD_LABELS } from '../expenseCategories';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
 const EMPTY = {
-  amount: '', currency: 'EUR', expense_date: today(), beneficiary: '', reason: '', category: '',
+  amount: '', currency: 'EUR', expense_date: today(), beneficiary: '', reason: '', category: '', payment_method: '',
 };
 
 export default function ExpenseForm({ initial, onSubmit, submitLabel = 'Enregistrer' }) {
@@ -77,6 +77,15 @@ export default function ExpenseForm({ initial, onSubmit, submitLabel = 'Enregist
           </select>
         </Field>
       </Row>
+
+      <Field label="Modalité paiement">
+        <select value={form.payment_method} onChange={(e) => update('payment_method', e.target.value)}>
+          <option value="">Non renseigné</option>
+          {Object.entries(PAYMENT_METHOD_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </Field>
 
       <Field label="Bénéficiaire *">
         <input
