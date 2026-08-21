@@ -18,6 +18,7 @@ connaissances techniques pour les exécuter.
 | [06-affichage-mobile.md](06-affichage-mobile.md) | Utilisation sur iPhone / petit écran |
 | [07-regressions-connues.md](07-regressions-connues.md) | Bugs déjà rencontrés et corrigés — à ne jamais laisser revenir |
 | [08-depenses.md](08-depenses.md) | Module Dépenses : création, filtres, totaux par devise |
+| [09-produits.md](09-produits.md) | Module Produits : création, unicité SKU, cycle actif/inactif |
 
 ## Comment utiliser ce dossier
 
