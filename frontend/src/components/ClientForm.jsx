@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { COUNTRIES } from '../countries';
 
 const EMPTY = {
   first_name: '', last_name: '', company_name: '', email: '', phone: '',
@@ -112,7 +113,11 @@ export default function ClientForm({ initial, onSubmit, submitLabel = 'Enregistr
           <input value={form.city} onChange={(e) => update('city', e.target.value)} />
         </Field>
         <Field label="Pays">
-          <input value={form.country} onChange={(e) => update('country', e.target.value)} />
+          <select value={form.country} onChange={(e) => update('country', e.target.value)}>
+            {COUNTRIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </Field>
       </Row>
 
