@@ -52,10 +52,24 @@ done
 echo "[remote] Migrations..."
 docker compose -f docker-compose.prod.yml --env-file .env.production exec -T backend npm run migrate
 
+# Nginx résout les noms "backend"/"frontend" une seule fois au démarrage :
+# quand ces conteneurs sont recréés (nouvelle image = nouvelle IP Docker),
+# Nginx garde l'ancienne IP en cache -> 502 jusqu'à son propre redémarrage.
+echo "[remote] Redémarrage de Nginx (pour qu'il reprenne les IP à jour de backend/frontend)..."
+docker compose -f docker-compose.prod.yml --env-file .env.production restart nginx
+
 echo "[remote] Ouverture des ports 80/443 (ufw)..."
 ufw allow 80,443/tcp || true
 
 echo "[remote] Statut des services :"
 docker compose -f docker-compose.prod.yml --env-file .env.production ps
 
-echo "[remote] OK. Vérifie : curl http://$(curl -s ifconfig.me 2>/dev/null || echo 212.237.9.233)/api/health"
+echo "[remote] Smoke test (backend, en direct dans le conteneur)..."
+sleep 2
+if docker compose -f docker-compose.prod.yml --env-file .env.production exec -T backend \
+    node -e "require('http').get('http://localhost:4000/api/health', r => process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"; then
+  echo "[remote] OK — backend opérationnel."
+else
+  echo "[remote] ÉCHEC — le backend ne répond pas (voir 'docker compose logs backend')." >&2
+  exit 1
+fi
