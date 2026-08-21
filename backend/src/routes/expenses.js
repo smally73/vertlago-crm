@@ -70,15 +70,15 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   const { amount, currency, expense_date, beneficiary, reason, category, payment_method } = req.body;
 
-  if (!amount || !beneficiary || !category) {
-    return res.status(400).json({ error: 'Montant, bénéficiaire et typologie sont requis.' });
+  if (!amount || !beneficiary || !category || !payment_method) {
+    return res.status(400).json({ error: 'Montant, bénéficiaire, typologie et modalité de paiement sont requis.' });
   }
 
   const { rows } = await pool.query(
     `INSERT INTO expenses (amount, currency, expense_date, beneficiary, reason, category, payment_method, created_by)
      VALUES ($1, COALESCE($2,'EUR'), COALESCE($3, CURRENT_DATE), $4, $5, $6, $7, $8)
      RETURNING *`,
-    [amount, currency, expense_date || null, beneficiary, reason, category, payment_method || null, req.user.id]
+    [amount, currency, expense_date || null, beneficiary, reason, category, payment_method, req.user.id]
   );
   res.status(201).json(rows[0]);
 });
@@ -87,14 +87,16 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const fields = ['amount', 'currency', 'expense_date', 'beneficiary', 'reason', 'category', 'payment_method'];
-  const nullableFields = ['payment_method'];
+
+  if ('payment_method' in req.body && !req.body.payment_method) {
+    return res.status(400).json({ error: 'La modalité de paiement est requise.' });
+  }
 
   const updates = [];
   const params = [];
   for (const field of fields) {
     if (field in req.body) {
-      const value = nullableFields.includes(field) ? (req.body[field] || null) : req.body[field];
-      params.push(value);
+      params.push(req.body[field]);
       updates.push(`${field} = $${params.length}`);
     }
   }

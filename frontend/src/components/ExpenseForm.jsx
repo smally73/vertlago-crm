@@ -31,8 +31,8 @@ export default function ExpenseForm({ initial, onSubmit, submitLabel = 'Enregist
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (!form.amount || !form.beneficiary || !form.category) {
-      setError('Montant, bénéficiaire et typologie sont requis.');
+    if (!form.amount || !form.beneficiary || !form.category || !form.payment_method) {
+      setError('Montant, bénéficiaire, typologie et modalité de paiement sont requis.');
       return;
     }
     setSaving(true);
@@ -78,9 +78,9 @@ export default function ExpenseForm({ initial, onSubmit, submitLabel = 'Enregist
         </Field>
       </Row>
 
-      <Field label="Modalité paiement">
+      <Field label="Modalité paiement *">
         <select value={form.payment_method} onChange={(e) => update('payment_method', e.target.value)}>
-          <option value="">Non renseigné</option>
+          <option value="">Choisir...</option>
           {Object.entries(PAYMENT_METHOD_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
           ))}

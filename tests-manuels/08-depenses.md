@@ -29,30 +29,39 @@ apparaît avec toutes les valeurs saisies correctement affichées (date au
 format JJ/MM/AAAA, typologie sous forme d'étiquette, montant + devise,
 modalité de paiement en clair dans sa colonne).
 
-## TC-65 — Modalité de paiement facultative
+## TC-65 — Modalité de paiement obligatoire
 
 **Objectif** : vérifier que "Modalité paiement" (Cash / Virement bancaire)
-n'est pas obligatoire, contrairement à Montant/Bénéficiaire/Typologie.
+est bien requise, comme Montant/Bénéficiaire/Typologie — y compris en
+modification (on ne doit pas pouvoir la vider sur une dépense existante).
 
 **Étapes** :
-1. Créer une dépense en laissant "Modalité paiement" sur "Non renseigné".
+1. Créer une dépense en laissant "Modalité paiement" sur "Choisir...".
+2. Sur une dépense existante ayant une modalité renseignée, ouvrir
+   "Modifier" et essayer de repasser Modalité paiement sur "Choisir...".
 
-**Résultat attendu** : la création réussit ; la colonne "Modalité
-paiement" affiche "—" dans la liste pour cette dépense.
+**Résultat attendu** : dans les deux cas, l'enregistrement est bloqué avec
+un message clair mentionnant la modalité de paiement.
+
+**Note** : des dépenses créées avant l'ajout de ce champ peuvent exister
+sans modalité renseignée (affichage "—" dans la liste) — c'est normal,
+seules les nouvelles créations/modifications sont concernées par cette
+obligation.
 
 ## TC-48 — Champs obligatoires
 
-**Objectif** : vérifier que Montant, Bénéficiaire et Typologie sont
-réellement requis (Motif et Date restent optionnels — la Date a une valeur
-par défaut).
+**Objectif** : vérifier que Montant, Bénéficiaire, Typologie et Modalité
+paiement sont réellement requis (Motif et Date restent optionnels — la
+Date a une valeur par défaut).
 
 **Étapes** :
 1. Sur le formulaire, laisser Montant vide, remplir le reste, essayer de
    créer.
 2. Laisser Bénéficiaire vide, essayer de créer.
 3. Laisser Typologie sur "Choisir...", essayer de créer.
+4. Laisser Modalité paiement sur "Choisir...", essayer de créer.
 
-**Résultat attendu** : dans les 3 cas, la création est bloquée avec un
+**Résultat attendu** : dans les 4 cas, la création est bloquée avec un
 message clair, aucune dépense n'est créée.
 
 ## TC-49 — Devise par défaut et choix
