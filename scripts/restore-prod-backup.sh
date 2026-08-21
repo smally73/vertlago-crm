@@ -20,7 +20,7 @@ trap 'rm -rf "$WORK_DIR"' EXIT
 
 # ---------- 1. Choix de la sauvegarde ----------
 log_info "Sauvegardes disponibles sur $PROD_HOST..."
-mapfile -t BACKUPS < <(ssh "$PROD_USER@$PROD_HOST" \
+mapfile -t BACKUPS < <(ssh -n "$PROD_USER@$PROD_HOST" \
   "ls -1t $REMOTE_BACKUP_DIR/vertlago_crm_*.sql.gz 2>/dev/null")
 
 if [[ ${#BACKUPS[@]} -eq 0 ]]; then
